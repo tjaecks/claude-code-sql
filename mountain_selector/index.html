@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Swiss 4000m Peaks</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-size: 13px;
+      background: #f5f5f5;
+      color: #1a1a1a;
+    }
+
+    header {
+      background: #1c2b3a;
+      color: #fff;
+      padding: 20px 24px 16px;
+    }
+    header h1 { font-size: 20px; font-weight: 600; letter-spacing: 0.3px; }
+    header p  { font-size: 12px; color: #8fa3b5; margin-top: 4px; }
+
+    .toolbar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 24px;
+      background: #fff;
+      border-bottom: 1px solid #e0e0e0;
+      flex-wrap: wrap;
+    }
+
+    .toolbar input[type="text"] {
+      flex: 1;
+      min-width: 200px;
+      max-width: 380px;
+      padding: 6px 10px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 13px;
+      outline: none;
+    }
+    .toolbar input[type="text"]:focus { border-color: #1c2b3a; }
+
+    .toolbar button {
+      padding: 6px 14px;
+      background: #1c2b3a;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      font-size: 13px;
+      cursor: pointer;
+    }
+    .toolbar button:hover { background: #2d4459; }
+    .toolbar button.reset {
+      background: transparent;
+      color: #666;
+      border: 1px solid #ccc;
+    }
+    .toolbar button.reset:hover { background: #f0f0f0; color: #333; }
+
+    .filters {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .filters select {
+      padding: 6px 8px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 12px;
+      background: #fff;
+      outline: none;
+      cursor: pointer;
+    }
+    .filters select:focus { border-color: #1c2b3a; }
+    .filters label { font-size: 12px; color: #666; }
+
+    .count {
+      margin-left: auto;
+      font-size: 12px;
+      color: #888;
+      white-space: nowrap;
+    }
+
+    .table-wrap {
+      width: 100%;
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: #fff;
+    }
+
+    thead tr {
+      background: #1c2b3a;
+      color: #fff;
+    }
+
+    th {
+      padding: 9px 10px;
+      text-align: left;
+      font-weight: 500;
+      font-size: 12px;
+      white-space: nowrap;
+      user-select: none;
+      cursor: pointer;
+      position: relative;
+    }
+    th:hover { background: #2d4459; }
+    th .sort-icon { margin-left: 4px; opacity: 0.4; font-size: 10px; }
+    th.asc  .sort-icon { opacity: 1; }
+    th.desc .sort-icon { opacity: 1; }
+
+    td {
+      padding: 7px 10px;
+      border-bottom: 1px solid #ebebeb;
+      white-space: nowrap;
+    }
+
+    tr:hover td { background: #f0f5fa; }
+    tr:nth-child(even) td { background: #fafafa; }
+    tr:nth-child(even):hover td { background: #f0f5fa; }
+
+    td.num { text-align: right; font-variant-numeric: tabular-nums; }
+
+    .badge {
+      display: inline-block;
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-size: 11px;
+      font-weight: 500;
+    }
+    .badge-vs  { background: #ddeeff; color: #1a5a8a; }
+    .badge-be  { background: #fff0cc; color: #7a5500; }
+    .badge-gr  { background: #e8ffe8; color: #1a6b1a; }
+    .badge-it  { background: #ffe8e8; color: #8a1a1a; }
+
+    .no-results {
+      text-align: center;
+      padding: 40px;
+      color: #999;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Swiss 4000m Peaks</h1>
+  <p>50 summits &ge;4000 m &mdash; UIAA official list &mdash; distances from Richterswil (8805)</p>
+</header>
+
+<div class="toolbar">
+  <input type="text" id="searchInput" placeholder="Search peaks, massif, canton…" />
+  <button onclick="applySearch()">Search</button>
+  <button class="reset" onclick="resetAll()">Reset</button>
+
+  <div class="filters">
+    <label>Range</label>
+    <select id="filterRange" onchange="applySearch()">
+      <option value="">All ranges</option>
+      <option>Pennine Alps</option>
+      <option>Bernese Alps</option>
+      <option>Rhaetian Alps</option>
+    </select>
+
+    <label>Massif</label>
+    <select id="filterMassif" onchange="applySearch()">
+      <option value="">All massifs</option>
+    </select>
+
+    <label>Canton</label>
+    <select id="filterCanton" onchange="applySearch()">
+      <option value="">All cantons</option>
+      <option value="VS">VS (Valais)</option>
+      <option value="BE">BE (Bern)</option>
+      <option value="GR">GR (Graubünden)</option>
+      <option value="IT">IT (border Italy)</option>
+    </select>
+
+    <label>Min elev. (m)</label>
+    <select id="filterElev" onchange="applySearch()">
+      <option value="0">≥ 4000</option>
+      <option value="4100">≥ 4100</option>
+      <option value="4200">≥ 4200</option>
+      <option value="4300">≥ 4300</option>
+      <option value="4400">≥ 4400</option>
+      <option value="4500">≥ 4500</option>
+    </select>
+  </div>
+
+  <span class="count" id="rowCount"></span>
+</div>
+
+<div class="table-wrap">
+  <table id="peaksTable">
+    <thead>
+      <tr>
+        <th data-col="id"                  data-type="num">#<span class="sort-icon">↕</span></th>
+        <th data-col="name"                              >Name<span class="sort-icon">↕</span></th>
+        <th data-col="name_local"                        >Local name<span class="sort-icon">↕</span></th>
+        <th data-col="massif"                            >Massif<span class="sort-icon">↕</span></th>
+        <th data-col="range"                             >Range<span class="sort-icon">↕</span></th>
+        <th data-col="elevation_m"         data-type="num">Elev (m)<span class="sort-icon">↕</span></th>
+        <th data-col="latitude"            data-type="num">Lat °N<span class="sort-icon">↕</span></th>
+        <th data-col="longitude"           data-type="num">Lon °E<span class="sort-icon">↕</span></th>
+        <th data-col="prominence_m"        data-type="num">Prom (m)<span class="sort-icon">↕</span></th>
+        <th data-col="isolation_km"        data-type="num">Isol (km)<span class="sort-icon">↕</span></th>
+        <th data-col="first_ascent_year"   data-type="num">1st ascent<span class="sort-icon">↕</span></th>
+        <th data-col="cantons"                           >Cantons<span class="sort-icon">↕</span></th>
+        <th data-col="uiaa_rank"           data-type="num">UIAA rank<span class="sort-icon">↕</span></th>
+        <th data-col="dist_richterswil_km" data-type="num">Dist Richterswil (km)<span class="sort-icon">↕</span></th>
+      </tr>
+    </thead>
+    <tbody id="tableBody"></tbody>
+  </table>
+  <div class="no-results" id="noResults" style="display:none">No peaks match your criteria.</div>
+</div>
+
+<script>
+const PEAKS = [
+  {id:1,  name:"Dufourspitze",           name_local:"Pointe Dufour",                           massif:"Monte Rosa",      range:"Pennine Alps",  elevation_m:4634, latitude:45.936833, longitude:7.867056, prominence_m:2165, isolation_km:78.3,  first_ascent_year:1855, cantons:"VS/IT", uiaa_rank:3,  dist_richterswil_km:159.4},
+  {id:2,  name:"Nordend",                name_local:"Punta Nord",                              massif:"Monte Rosa",      range:"Pennine Alps",  elevation_m:4609, latitude:45.942222, longitude:7.870000, prominence_m:89,   isolation_km:0.6,   first_ascent_year:1861, cantons:"VS/IT", uiaa_rank:4,  dist_richterswil_km:158.7},
+  {id:3,  name:"Zumsteinspitze",         name_local:"Punta Zumstein",                          massif:"Monte Rosa",      range:"Pennine Alps",  elevation_m:4563, latitude:45.931944, longitude:7.871389, prominence_m:112,  isolation_km:0.5,   first_ascent_year:1820, cantons:"VS/IT", uiaa_rank:5,  dist_richterswil_km:159.7},
+  {id:4,  name:"Signalkuppe",            name_local:"Punta Gnifetti",                          massif:"Monte Rosa",      range:"Pennine Alps",  elevation_m:4554, latitude:45.927222, longitude:7.876944, prominence_m:98,   isolation_km:0.7,   first_ascent_year:1842, cantons:"VS/IT", uiaa_rank:6,  dist_richterswil_km:160.0},
+  {id:5,  name:"Parrotspitze",           name_local:"Punta Parrot",                            massif:"Monte Rosa",      range:"Pennine Alps",  elevation_m:4434, latitude:45.919722, longitude:7.871389, prominence_m:134,  isolation_km:0.9,   first_ascent_year:1863, cantons:"VS/IT", uiaa_rank:15, dist_richterswil_km:160.9},
+  {id:6,  name:"Ludwigshoehe",           name_local:"Punta Luigi Amedeo di Savoia",            massif:"Monte Rosa",      range:"Pennine Alps",  elevation_m:4341, latitude:45.917222, longitude:7.862222, prominence_m:57,   isolation_km:0.7,   first_ascent_year:1822, cantons:"VS/IT", uiaa_rank:17, dist_richterswil_km:161.5},
+  {id:7,  name:"Schwarzhorn",            name_local:"Corno Nero",                              massif:"Monte Rosa",      range:"Pennine Alps",  elevation_m:4321, latitude:45.914900, longitude:7.862000, prominence_m:42,   isolation_km:0.3,   first_ascent_year:1873, cantons:"IT/VS", uiaa_rank:19, dist_richterswil_km:161.7},
+  {id:8,  name:"Vincent Pyramid",        name_local:"Piramide Vincent",                        massif:"Monte Rosa",      range:"Pennine Alps",  elevation_m:4215, latitude:45.907778, longitude:7.861944, prominence_m:128,  isolation_km:0.7,   first_ascent_year:1819, cantons:"IT",    uiaa_rank:30, dist_richterswil_km:162.4},
+  {id:9,  name:"Dom",                    name_local:null,                                      massif:"Mischabel",       range:"Pennine Alps",  elevation_m:4546, latitude:46.095000, longitude:7.860000, prominence_m:1057, isolation_km:16.9,  first_ascent_year:1858, cantons:"VS",    uiaa_rank:7,  dist_richterswil_km:144.2},
+  {id:10, name:"Taeschhorn",             name_local:"Täschhorn",                               massif:"Mischabel",       range:"Pennine Alps",  elevation_m:4491, latitude:46.083611, longitude:7.857222, prominence_m:213,  isolation_km:1.2,   first_ascent_year:1862, cantons:"VS",    uiaa_rank:10, dist_richterswil_km:145.4},
+  {id:11, name:"Nadelhorn",              name_local:null,                                      massif:"Mischabel",       range:"Pennine Alps",  elevation_m:4327, latitude:46.108750, longitude:7.864167, prominence_m:207,  isolation_km:1.7,   first_ascent_year:1858, cantons:"VS",    uiaa_rank:18, dist_richterswil_km:142.8},
+  {id:12, name:"Lenzspitze",             name_local:null,                                      massif:"Mischabel",       range:"Pennine Alps",  elevation_m:4294, latitude:46.104639, longitude:7.868444, prominence_m:86,   isolation_km:0.5,   first_ascent_year:1870, cantons:"VS",    uiaa_rank:22, dist_richterswil_km:143.0},
+  {id:13, name:"Stecknadelhorn",         name_local:null,                                      massif:"Mischabel",       range:"Pennine Alps",  elevation_m:4241, latitude:46.111528, longitude:7.859667, prominence_m:27,   isolation_km:0.5,   first_ascent_year:1887, cantons:"VS",    uiaa_rank:26, dist_richterswil_km:142.7},
+  {id:14, name:"Hohberghorn",            name_local:null,                                      massif:"Mischabel",       range:"Pennine Alps",  elevation_m:4219, latitude:46.112694, longitude:7.853861, prominence_m:76,   isolation_km:0.4,   first_ascent_year:1869, cantons:"VS",    uiaa_rank:29, dist_richterswil_km:142.8},
+  {id:15, name:"Duerrenhorn",            name_local:"Dürrenhorn",                              massif:"Mischabel",       range:"Pennine Alps",  elevation_m:4035, latitude:46.119722, longitude:7.848056, prominence_m:124,  isolation_km:0.8,   first_ascent_year:1879, cantons:"VS",    uiaa_rank:72, dist_richterswil_km:142.4},
+  {id:16, name:"Alphubel",               name_local:null,                                      massif:"Mischabel",       range:"Pennine Alps",  elevation_m:4206, latitude:46.062939, longitude:7.863911, prominence_m:359,  isolation_km:2.3,   first_ascent_year:1860, cantons:"VS",    uiaa_rank:32, dist_richterswil_km:147.2},
+  {id:17, name:"Rimpfischhorn",          name_local:null,                                      massif:"Mischabel",       range:"Pennine Alps",  elevation_m:4199, latitude:46.023056, longitude:7.883889, prominence_m:647,  isolation_km:4.7,   first_ascent_year:1859, cantons:"VS",    uiaa_rank:33, dist_richterswil_km:150.3},
+  {id:18, name:"Strahlhorn",             name_local:null,                                      massif:"Mischabel",       range:"Pennine Alps",  elevation_m:4190, latitude:46.013222, longitude:7.901750, prominence_m:404,  isolation_km:1.8,   first_ascent_year:1854, cantons:"VS",    uiaa_rank:35, dist_richterswil_km:150.6},
+  {id:19, name:"Allalinhorn",            name_local:null,                                      massif:"Mischabel",       range:"Pennine Alps",  elevation_m:4027, latitude:46.046139, longitude:7.894806, prominence_m:257,  isolation_km:2.1,   first_ascent_year:1856, cantons:"VS",    uiaa_rank:73, dist_richterswil_km:147.6},
+  {id:20, name:"Weisshorn",              name_local:null,                                      massif:"Weisshorn",       range:"Pennine Alps",  elevation_m:4506, latitude:46.101667, longitude:7.716111, prominence_m:1234, isolation_km:11.1,  first_ascent_year:1861, cantons:"VS",    uiaa_rank:9,  dist_richterswil_km:149.6},
+  {id:21, name:"Bishorn",                name_local:"Pointe de Bies",                          massif:"Weisshorn",       range:"Pennine Alps",  elevation_m:4153, latitude:46.117778, longitude:7.714722, prominence_m:90,   isolation_km:0.8,   first_ascent_year:1884, cantons:"VS",    uiaa_rank:42, dist_richterswil_km:148.2},
+  {id:22, name:"Dent Blanche",           name_local:null,                                      massif:"Dent Blanche",    range:"Pennine Alps",  elevation_m:4357, latitude:46.034167, longitude:7.611944, prominence_m:916,  isolation_km:7.4,   first_ascent_year:1862, cantons:"VS",    uiaa_rank:16, dist_richterswil_km:160.4},
+  {id:23, name:"Zinalrothorn",           name_local:"Rothorn de Zinal",                        massif:"Zinalrothorn",    range:"Pennine Alps",  elevation_m:4221, latitude:46.064722, longitude:7.690000, prominence_m:491,  isolation_km:4.5,   first_ascent_year:1864, cantons:"VS",    uiaa_rank:28, dist_richterswil_km:154.1},
+  {id:24, name:"Ober Gabelhorn",         name_local:null,                                      massif:"Ober Gabelhorn",  range:"Pennine Alps",  elevation_m:4063, latitude:46.038333, longitude:7.667778, prominence_m:536,  isolation_km:3.1,   first_ascent_year:1865, cantons:"VS",    uiaa_rank:62, dist_richterswil_km:157.5},
+  {id:25, name:"Weissmies",              name_local:null,                                      massif:"Weissmies",       range:"Pennine Alps",  elevation_m:4017, latitude:46.127778, longitude:8.011944, prominence_m:1183, isolation_km:11.2,  first_ascent_year:1855, cantons:"VS",    uiaa_rank:77, dist_richterswil_km:135.4},
+  {id:26, name:"Lagginhorn",             name_local:"Laquinhorn",                              massif:"Weissmies",       range:"Pennine Alps",  elevation_m:4010, latitude:46.157222, longitude:8.003056, prominence_m:512,  isolation_km:3.3,   first_ascent_year:1856, cantons:"VS",    uiaa_rank:79, dist_richterswil_km:132.8},
+  {id:27, name:"Lyskamm Ostgipfel",      name_local:"Liskamm Orientale",                       massif:"Monte Rosa",      range:"Pennine Alps",  elevation_m:4533, latitude:45.922500, longitude:7.835556, prominence_m:379,  isolation_km:2.9,   first_ascent_year:1861, cantons:"VS/IT", uiaa_rank:8,  dist_richterswil_km:161.9},
+  {id:28, name:"Lyskamm Westgipfel",     name_local:"Liskamm Occidentale",                     massif:"Monte Rosa",      range:"Pennine Alps",  elevation_m:4479, latitude:45.926512, longitude:7.823322, prominence_m:73,   isolation_km:1.1,   first_ascent_year:1864, cantons:"VS/IT", uiaa_rank:11, dist_richterswil_km:161.9},
+  {id:29, name:"Matterhorn",             name_local:"Monte Cervino / Mont Cervin",              massif:"Matterhorn",      range:"Pennine Alps",  elevation_m:4478, latitude:45.976389, longitude:7.658611, prominence_m:1043, isolation_km:13.9,  first_ascent_year:1865, cantons:"VS/IT", uiaa_rank:12, dist_richterswil_km:163.7},
+  {id:30, name:"Dent d'Herens",          name_local:"Dente d'Hérens",                          massif:"Matterhorn",      range:"Pennine Alps",  elevation_m:4173, latitude:45.970056, longitude:7.605083, prominence_m:704,  isolation_km:4.2,   first_ascent_year:1863, cantons:"VS/IT", uiaa_rank:38, dist_richterswil_km:166.5},
+  {id:31, name:"Castor",                 name_local:"Castore",                                 massif:"Breithorn",       range:"Pennine Alps",  elevation_m:4228, latitude:45.922222, longitude:7.792778, prominence_m:156,  isolation_km:2.4,   first_ascent_year:1861, cantons:"VS/IT", uiaa_rank:27, dist_richterswil_km:163.5},
+  {id:32, name:"Pollux",                 name_local:"Polluce",                                 massif:"Breithorn",       range:"Pennine Alps",  elevation_m:4092, latitude:45.927778, longitude:7.785278, prominence_m:243,  isolation_km:0.7,   first_ascent_year:1864, cantons:"VS/IT", uiaa_rank:55, dist_richterswil_km:163.2},
+  {id:33, name:"Breithorn West",         name_local:"Breithorn Occidentale",                   massif:"Breithorn",       range:"Pennine Alps",  elevation_m:4164, latitude:45.941111, longitude:7.747222, prominence_m:438,  isolation_km:4.2,   first_ascent_year:1813, cantons:"VS/IT", uiaa_rank:39, dist_richterswil_km:163.4},
+  {id:34, name:"Breithorn Mittelgipfel", name_local:"Breithorn Centrale",                      massif:"Breithorn",       range:"Pennine Alps",  elevation_m:4160, latitude:45.938889, longitude:7.756389, prominence_m:73,   isolation_km:0.7,   first_ascent_year:1813, cantons:"VS/IT", uiaa_rank:41, dist_richterswil_km:163.3},
+  {id:35, name:"Breithorn Zwillinge W",  name_local:"Gemelli Occidentale",                     massif:"Breithorn",       range:"Pennine Alps",  elevation_m:4139, latitude:45.937222, longitude:7.767222, prominence_m:120,  isolation_km:0.8,   first_ascent_year:null, cantons:"VS/IT", uiaa_rank:43, dist_richterswil_km:163.0},
+  {id:36, name:"Breithorn Gendarm",      name_local:"Gemello Est",                             massif:"Breithorn",       range:"Pennine Alps",  elevation_m:4106, latitude:45.935833, longitude:7.770556, prominence_m:36,   isolation_km:0.3,   first_ascent_year:null, cantons:"VS/IT", uiaa_rank:51, dist_richterswil_km:163.0},
+  {id:37, name:"Breithorn Roccia Nera",  name_local:"Schwarzfluh / Roche Noire",               massif:"Breithorn",       range:"Pennine Alps",  elevation_m:4075, latitude:45.932500, longitude:7.775278, prominence_m:30,   isolation_km:0.4,   first_ascent_year:null, cantons:"VS/IT", uiaa_rank:57, dist_richterswil_km:163.2},
+  {id:38, name:"Combin de Grafeneire",   name_local:"Grand Combin de Grafeneire",              massif:"Grand Combin",    range:"Pennine Alps",  elevation_m:4314, latitude:45.937500, longitude:7.299167, prominence_m:1512, isolation_km:26.5,  first_ascent_year:1857, cantons:"VS",    uiaa_rank:20, dist_richterswil_km:183.6},
+  {id:39, name:"Combin de Valsorey",     name_local:"Grand Combin de Valsorey",                massif:"Grand Combin",    range:"Pennine Alps",  elevation_m:4184, latitude:45.938056, longitude:7.290556, prominence_m:57,   isolation_km:0.5,   first_ascent_year:1872, cantons:"VS",    uiaa_rank:36, dist_richterswil_km:183.9},
+  {id:40, name:"Combin de la Tsessette", name_local:"Grand Combin de la Tsessette",            massif:"Grand Combin",    range:"Pennine Alps",  elevation_m:4135, latitude:45.942778, longitude:7.310833, prominence_m:57,   isolation_km:0.9,   first_ascent_year:1894, cantons:"VS",    uiaa_rank:44, dist_richterswil_km:182.5},
+  {id:41, name:"Finsteraarhorn",         name_local:null,                                      massif:"Finsteraarhorn",  range:"Bernese Alps",  elevation_m:4274, latitude:46.537472, longitude:8.126028, prominence_m:2279, isolation_km:51.7,  first_ascent_year:1812, cantons:"BE/VS", uiaa_rank:23, dist_richterswil_km:91.9},
+  {id:42, name:"Aletschhorn",            name_local:null,                                      massif:"Aletschhorn",     range:"Bernese Alps",  elevation_m:4193, latitude:46.465100, longitude:7.993661, prominence_m:1043, isolation_km:13.5,  first_ascent_year:1859, cantons:"VS/BE", uiaa_rank:34, dist_richterswil_km:104.4},
+  {id:43, name:"Jungfrau",               name_local:null,                                      massif:"Jungfrau",        range:"Bernese Alps",  elevation_m:4158, latitude:46.536806, longitude:7.962639, prominence_m:694,  isolation_km:8.3,   first_ascent_year:1811, cantons:"BE/VS", uiaa_rank:40, dist_richterswil_km:99.7},
+  {id:44, name:"Moench",                 name_local:"Mönch / Moine",                           massif:"Jungfrau",        range:"Bernese Alps",  elevation_m:4107, latitude:46.558333, longitude:7.997222, prominence_m:591,  isolation_km:3.5,   first_ascent_year:1857, cantons:"BE/VS", uiaa_rank:48, dist_richterswil_km:96.2},
+  {id:45, name:"Schreckhorn",            name_local:"Corne du Diable",                         massif:"Schreckhorn",     range:"Bernese Alps",  elevation_m:4078, latitude:46.589972, longitude:8.118139, prominence_m:795,  isolation_km:5.9,   first_ascent_year:1861, cantons:"BE",    uiaa_rank:56, dist_richterswil_km:87.6},
+  {id:46, name:"Gross Fiescherhorn",     name_local:"Grand Fiescherhorn",                      massif:"Fiescherhorn",    range:"Bernese Alps",  elevation_m:4049, latitude:46.551389, longitude:8.061111, prominence_m:396,  isolation_km:4.7,   first_ascent_year:1862, cantons:"BE/VS", uiaa_rank:65, dist_richterswil_km:93.6},
+  {id:47, name:"Gruenhorn",              name_local:"Grosses Grünhorn",                        massif:"Fiescherhorn",    range:"Bernese Alps",  elevation_m:4044, latitude:46.531889, longitude:8.077722, prominence_m:303,  isolation_km:2.5,   first_ascent_year:1865, cantons:"BE/VS", uiaa_rank:69, dist_richterswil_km:94.6},
+  {id:48, name:"Lauteraarhorn",          name_local:null,                                      massif:"Fiescherhorn",    range:"Bernese Alps",  elevation_m:4042, latitude:46.583389, longitude:8.128417, prominence_m:128,  isolation_km:1.0,   first_ascent_year:1842, cantons:"BE/VS", uiaa_rank:70, dist_richterswil_km:87.7},
+  {id:49, name:"Hinteres Fiescherhorn",  name_local:"Petit Fiescherhorn",                      massif:"Fiescherhorn",    range:"Bernese Alps",  elevation_m:4025, latitude:46.546389, longitude:8.067778, prominence_m:102,  isolation_km:0.7,   first_ascent_year:1885, cantons:"BE/VS", uiaa_rank:74, dist_richterswil_km:93.8},
+  {id:50, name:"Piz Bernina",            name_local:"Pizzo Bernina",                           massif:"Bernina",         range:"Rhaetian Alps", elevation_m:4049, latitude:46.382222, longitude:9.908056, prominence_m:2236, isolation_km:138.0, first_ascent_year:1850, cantons:"GR",    uiaa_rank:66, dist_richterswil_km:122.5},
+];
+
+// Populate massif dropdown
+const massifs = [...new Set(PEAKS.map(p => p.massif))].sort();
+const massifSel = document.getElementById('filterMassif');
+massifs.forEach(m => {
+  const o = document.createElement('option');
+  o.value = m; o.textContent = m;
+  massifSel.appendChild(o);
+});
+
+let currentData = [...PEAKS];
+let sortCol = null;
+let sortDir = 1;
+
+function cantonBadge(c) {
+  const cls = c.includes('BE') ? 'badge-be' : c.includes('GR') ? 'badge-gr' : c.startsWith('IT') ? 'badge-it' : 'badge-vs';
+  return `<span class="badge ${cls}">${c}</span>`;
+}
+
+function render(data) {
+  const tbody = document.getElementById('tableBody');
+  const noRes = document.getElementById('noResults');
+  document.getElementById('rowCount').textContent = `${data.length} of ${PEAKS.length} peaks`;
+
+  if (!data.length) {
+    tbody.innerHTML = '';
+    noRes.style.display = 'block';
+    return;
+  }
+  noRes.style.display = 'none';
+
+  tbody.innerHTML = data.map(p => `
+    <tr>
+      <td class="num">${p.id}</td>
+      <td><strong>${p.name}</strong></td>
+      <td>${p.name_local || '—'}</td>
+      <td>${p.massif}</td>
+      <td>${p.range}</td>
+      <td class="num">${p.elevation_m.toLocaleString()}</td>
+      <td class="num">${p.latitude.toFixed(6)}</td>
+      <td class="num">${p.longitude.toFixed(6)}</td>
+      <td class="num">${p.prominence_m != null ? p.prominence_m.toLocaleString() : '—'}</td>
+      <td class="num">${p.isolation_km != null ? p.isolation_km : '—'}</td>
+      <td class="num">${p.first_ascent_year || '—'}</td>
+      <td>${cantonBadge(p.cantons)}</td>
+      <td class="num">${p.uiaa_rank}</td>
+      <td class="num">${p.dist_richterswil_km}</td>
+    </tr>`).join('');
+}
+
+function applySearch() {
+  const q     = document.getElementById('searchInput').value.toLowerCase().trim();
+  const range = document.getElementById('filterRange').value;
+  const massif= document.getElementById('filterMassif').value;
+  const canton= document.getElementById('filterCanton').value;
+  const elev  = parseInt(document.getElementById('filterElev').value) || 0;
+
+  let data = PEAKS.filter(p => {
+    if (elev  && p.elevation_m < elev) return false;
+    if (range && p.range !== range) return false;
+    if (massif && p.massif !== massif) return false;
+    if (canton && !p.cantons.includes(canton)) return false;
+    if (q) {
+      const hay = [p.name, p.name_local, p.massif, p.range, p.cantons,
+                   p.first_ascent_year, p.elevation_m].join(' ').toLowerCase();
+      if (!hay.includes(q)) return false;
+    }
+    return true;
+  });
+
+  if (sortCol) {
+    data.sort((a, b) => {
+      const av = a[sortCol] ?? -Infinity;
+      const bv = b[sortCol] ?? -Infinity;
+      return av < bv ? -sortDir : av > bv ? sortDir : 0;
+    });
+  }
+
+  currentData = data;
+  render(data);
+}
+
+function resetAll() {
+  document.getElementById('searchInput').value = '';
+  document.getElementById('filterRange').value = '';
+  document.getElementById('filterMassif').value = '';
+  document.getElementById('filterCanton').value = '';
+  document.getElementById('filterElev').value = '0';
+  sortCol = null; sortDir = 1;
+  document.querySelectorAll('th').forEach(th => th.classList.remove('asc','desc'));
+  applySearch();
+}
+
+// Sortable headers
+document.querySelectorAll('th[data-col]').forEach(th => {
+  th.addEventListener('click', () => {
+    const col = th.dataset.col;
+    if (sortCol === col) sortDir *= -1;
+    else { sortCol = col; sortDir = 1; }
+    document.querySelectorAll('th').forEach(t => t.classList.remove('asc','desc'));
+    th.classList.add(sortDir === 1 ? 'asc' : 'desc');
+    applySearch();
+  });
+});
+
+// Search on Enter
+document.getElementById('searchInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter') applySearch();
+});
+
+// Initial render
+applySearch();
+</script>
+</body>
+</html>
