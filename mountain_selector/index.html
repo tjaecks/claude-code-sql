@@ -143,6 +143,13 @@
 
     td.num { text-align: right; font-variant-numeric: tabular-nums; }
 
+    td.truncate {
+      max-width: 200px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
     .badge {
       display: inline-block;
       padding: 2px 6px;
@@ -229,7 +236,6 @@
         <th data-col="first_ascent_date"                  >1st Ascent Date<span class="sort-icon">↕</span></th>
         <th data-col="first_ascent_party"               >1st Ascent Party<span class="sort-icon">↕</span></th>
         <th data-col="cantons"                           >Cantons<span class="sort-icon">↕</span></th>
-        <th data-col="uiaa_rank"           data-type="num">UIAA rank<span class="sort-icon">↕</span></th>
         <th data-col="dist_richterswil_km" data-type="num">Dist Richterswil (km)<span class="sort-icon">↕</span></th>
         <th>Show Map</th>
       </tr>
@@ -336,9 +342,8 @@ function render(data) {
       <td class="num">${p.prominence_m != null ? p.prominence_m.toLocaleString() : '—'}</td>
       <td class="num">${p.isolation_km != null ? p.isolation_km : '—'}</td>
       <td>${p.first_ascent_date || '—'}</td>
-      <td>${p.first_ascent_party || '—'}</td>
+      <td class="truncate" title="${p.first_ascent_party || ''}">${p.first_ascent_party || '—'}</td>
       <td>${cantonBadge(p.cantons)}</td>
-      <td class="num">${p.uiaa_rank}</td>
       <td class="num">${p.dist_richterswil_km}</td>
       <td><a href="map.html?name=${encodeURIComponent(p.name)}&lat=${p.latitude}&lon=${p.longitude}&elev=${p.elevation_m}&dist=${p.dist_richterswil_km}" target="_blank" style="color:#1c2b3a;font-weight:500;text-decoration:none;border:1px solid #1c2b3a;border-radius:3px;padding:2px 8px;font-size:12px;white-space:nowrap;">🗺 Map</a></td>
     </tr>`).join('');
