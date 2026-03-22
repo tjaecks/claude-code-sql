@@ -21,6 +21,10 @@ CREATE TABLE swiss_4000ers (
     uiaa_list               BOOLEAN         NOT NULL DEFAULT TRUE,  -- On official UIAA 82-peak list
     uiaa_rank               SMALLINT,                   -- Rank on UIAA list by elevation
     dist_richterswil_km     DECIMAL(6,1),               -- Air distance from Richterswil 8805 (km)
+    trailhead_name          VARCHAR(200),               -- Last car park / public transport stop for normal route
+    trailhead_description   TEXT,                       -- Short route approach & travel info (source: SAC Tourenportal)
+    trailhead_lat           DECIMAL(9,6),               -- WGS84 latitude of trailhead
+    trailhead_lon           DECIMAL(9,6),               -- WGS84 longitude of trailhead
     notes                   TEXT,
     created_at              TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
@@ -32,7 +36,8 @@ CREATE TABLE swiss_4000ers (
 INSERT INTO swiss_4000ers
     (name, name_local, massif, range, elevation_m, latitude, longitude,
      prominence_m, isolation_km, first_ascent_year, first_ascent_party,
-     cantons, uiaa_list, uiaa_rank, dist_richterswil_km, notes)
+     cantons, uiaa_list, uiaa_rank, dist_richterswil_km,
+     trailhead_name, trailhead_description, trailhead_lat, trailhead_lon, notes)
 VALUES
 
 -- MONTE ROSA MASSIF
@@ -371,3 +376,58 @@ CREATE VIEW peaks_by_prominence AS
     SELECT id, name, massif, elevation_m, prominence_m, cantons
     FROM swiss_4000ers
     ORDER BY prominence_m DESC;
+
+
+-- ============================================================
+-- TRAILHEAD DATA (source: SAC Tourenportal)
+-- ============================================================
+UPDATE swiss_4000ers SET trailhead_name='Zermatt (1608m)', trailhead_description='Train to Zermatt, walk to Monte Rosa Hut (2883m). Normal route ascends via Grenzgletscher.', trailhead_lat=46.0207, trailhead_lon=7.7491 WHERE id=1;
+UPDATE swiss_4000ers SET trailhead_name='Zermatt (1608m)', trailhead_description='Train to Zermatt; approach via Monte Rosa Hut (2883m). Ascends NE ridge from Silbersattel.', trailhead_lat=46.0207, trailhead_lon=7.7491 WHERE id=2;
+UPDATE swiss_4000ers SET trailhead_name='Zermatt (1608m)', trailhead_description='Train to Zermatt; via Monte Rosa Hut (2883m), Grenzgletscher to Grenzsattel, then south ridge.', trailhead_lat=46.0207, trailhead_lon=7.7491 WHERE id=3;
+UPDATE swiss_4000ers SET trailhead_name='Indren cable car (3275m), Gressoney/Alagna', trailhead_description='Cable car to Indren (3275m); overnight at Rifugio Gnifetti (3647m); via Lys Glacier to Capanna Margherita.', trailhead_lat=45.8759, trailhead_lon=7.8682 WHERE id=4;
+UPDATE swiss_4000ers SET trailhead_name='Indren cable car (3275m), Gressoney/Alagna', trailhead_description='Cable car to Indren (3275m), overnight Rifugio Gnifetti (3647m); Lys Glacier ridge via Signalkuppe.', trailhead_lat=45.8759, trailhead_lon=7.8682 WHERE id=5;
+UPDATE swiss_4000ers SET trailhead_name='Indren cable car (3275m), Gressoney/Alagna', trailhead_description='Cable car to Indren (3275m), overnight Rifugio Gnifetti (3647m); Lys Glacier ridge through Signalkuppe and Parrotspitze.', trailhead_lat=45.8759, trailhead_lon=7.8682 WHERE id=6;
+UPDATE swiss_4000ers SET trailhead_name='Indren cable car (3275m), Gressoney/Alagna', trailhead_description='Cable car to Indren (3275m), overnight Rifugio Gnifetti (3647m); via Lys Glacier col and steep snow/rock flank.', trailhead_lat=45.8759, trailhead_lon=7.8682 WHERE id=7;
+UPDATE swiss_4000ers SET trailhead_name='Indren cable car (3275m), Gressoney/Alagna', trailhead_description='Cable car to Indren (3275m), overnight Rifugio Gnifetti (3647m); Lys Glacier to east ridge.', trailhead_lat=45.8759, trailhead_lon=7.8682 WHERE id=8;
+UPDATE swiss_4000ers SET trailhead_name='Randa railway station (1407m)', trailhead_description='Train to Randa (Brig-Zermatt line); trail 1500m to Dom Hut (2940m); normal route via Festi Glacier to NW ridge.', trailhead_lat=46.1006, trailhead_lon=7.7839 WHERE id=9;
+UPDATE swiss_4000ers SET trailhead_name='Saas-Fee (1800m)', trailhead_description='Drive or bus to Saas-Fee; trail to Mischabel Hut (3340m) and Mischabeljoch bivouac; SE ridge from Mischabeljoch.', trailhead_lat=46.1117, trailhead_lon=7.9337 WHERE id=10;
+UPDATE swiss_4000ers SET trailhead_name='Saas-Fee (1800m)', trailhead_description='Drive or bus to Saas-Fee; trail to Mischabel Hut (3340m); NE Windgrat ridge over Hohbalm Glacier.', trailhead_lat=46.1117, trailhead_lon=7.9337 WHERE id=11;
+UPDATE swiss_4000ers SET trailhead_name='Saas-Fee (1800m)', trailhead_description='Drive or bus to Saas-Fee; trail to Mischabel Hut (3340m); north ridge from Nadelhorn col.', trailhead_lat=46.1117, trailhead_lon=7.9337 WHERE id=12;
+UPDATE swiss_4000ers SET trailhead_name='Saas-Fee (1800m)', trailhead_description='Drive or bus to Saas-Fee; trail to Mischabel Hut (3340m); traverse from Nadelhorn via Nadelgrat ridge.', trailhead_lat=46.1117, trailhead_lon=7.9337 WHERE id=13;
+UPDATE swiss_4000ers SET trailhead_name='Saas-Fee (1800m)', trailhead_description='Drive or bus to Saas-Fee; trail to Mischabel Hut (3340m); Nadelgrat from Stecknadelhorn.', trailhead_lat=46.1117, trailhead_lon=7.9337 WHERE id=14;
+UPDATE swiss_4000ers SET trailhead_name='Saas-Fee (1800m)', trailhead_description='Drive or bus to Saas-Fee; trail to Mischabel Hut (3340m); Nadelgrat traverse from Hohberghorn.', trailhead_lat=46.1117, trailhead_lon=7.9337 WHERE id=15;
+UPDATE swiss_4000ers SET trailhead_name='Saas-Fee, Felskinn cable car (2989m)', trailhead_description='Felskinn cable car from Saas-Fee; via Alphubeljoch from Fee Glacier, ascending broad NW snow flank.', trailhead_lat=46.1117, trailhead_lon=7.9337 WHERE id=16;
+UPDATE swiss_4000ers SET trailhead_name='Saas-Fee, Felskinn cable car (2989m)', trailhead_description='Felskinn cable car from Saas-Fee; via Britannia Hut (3030m) and Allalin Glacier, NE ridge.', trailhead_lat=46.1117, trailhead_lon=7.9337 WHERE id=17;
+UPDATE swiss_4000ers SET trailhead_name='Saas-Fee, Felskinn cable car (2989m)', trailhead_description='Felskinn cable car from Saas-Fee; via Britannia Hut (3030m), Allalin Glacier to Adlerpass, then NW ridge.', trailhead_lat=46.1117, trailhead_lon=7.9337 WHERE id=18;
+UPDATE swiss_4000ers SET trailhead_name='Saas-Fee, Metro Alpin Mittelallalin (3456m)', trailhead_description='Felskinn cable car then Metro Alpin to Mittelallalin (3456m); straightforward snow ascent ~500m to summit.', trailhead_lat=46.1117, trailhead_lon=7.9337 WHERE id=19;
+UPDATE swiss_4000ers SET trailhead_name='Randa railway station (1407m)', trailhead_description='Train to Randa; trail to Weisshorn Hut (2932m); normal route: long east ridge, exposed but non-technical.', trailhead_lat=46.1006, trailhead_lon=7.7839 WHERE id=20;
+UPDATE swiss_4000ers SET trailhead_name='Zinal village parking (1675m)', trailhead_description='Drive or bus to Zinal; trail 1580m to Cabane de Tracuit (3256m); NW glacier flank on straightforward snow.', trailhead_lat=46.1363, trailhead_lon=7.6268 WHERE id=21;
+UPDATE swiss_4000ers SET trailhead_name='Ferpecle, Les Salay parking (1767m)', trailhead_description='Drive to end of Ferpecle road (Les Salay, 1767m); via Bricola alp to Cabane de la Dent Blanche (3507m); south ridge.', trailhead_lat=46.0833, trailhead_lon=7.5667 WHERE id=22;
+UPDATE swiss_4000ers SET trailhead_name='Zermatt (1608m)', trailhead_description='Train to Zermatt; approach via Rothorn Hut (3198m); SW ridge via Rothorn Glacier and Biner-Platte slab.', trailhead_lat=46.0207, trailhead_lon=7.7491 WHERE id=23;
+UPDATE swiss_4000ers SET trailhead_name='Zermatt (1608m)', trailhead_description='Train to Zermatt; via Trift valley to Arben Bivouac (3224m); ascends Trift Glacier and NE ridge.', trailhead_lat=46.0207, trailhead_lon=7.7491 WHERE id=24;
+UPDATE swiss_4000ers SET trailhead_name='Saas-Grund, Kreuzboden gondola (1559m)', trailhead_description='Drive or bus to Saas-Grund; gondola to Kreuzboden (2397m), walk to Weissmies Hut (2726m); NW snow flank.', trailhead_lat=46.1333, trailhead_lon=7.9333 WHERE id=25;
+UPDATE swiss_4000ers SET trailhead_name='Saas-Grund, Kreuzboden gondola (1559m)', trailhead_description='Drive or bus to Saas-Grund; gondola to Kreuzboden (2397m) or Hohsaas; WSW ridge from Weissmies Hut area.', trailhead_lat=46.1333, trailhead_lon=7.9333 WHERE id=26;
+UPDATE swiss_4000ers SET trailhead_name='Zermatt, Klein Matterhorn cable car (3883m)', trailhead_description='Cable car to Klein Matterhorn (3883m); Breithorn plateau and Grenzgletscher to Lisjoch, then east ridge.', trailhead_lat=46.0207, trailhead_lon=7.7491 WHERE id=27;
+UPDATE swiss_4000ers SET trailhead_name='Zermatt, Klein Matterhorn cable car (3883m)', trailhead_description='Cable car to Klein Matterhorn (3883m); Breithorn plateau and Grenzgletscher to Lisjoch; traverse full Lyskamm ridge.', trailhead_lat=46.0207, trailhead_lon=7.7491 WHERE id=28;
+UPDATE swiss_4000ers SET trailhead_name='Zermatt, Schwarzsee cable car (2583m)', trailhead_description='Train to Zermatt then cable car to Schwarzsee (2583m); Hornli Ridge route to Hornlihutte (3260m), up NE ridge.', trailhead_lat=46.0207, trailhead_lon=7.7491 WHERE id=29;
+UPDATE swiss_4000ers SET trailhead_name='Zermatt (1608m)', trailhead_description='Train to Zermatt; via Zmutt valley to Schonbielhütte (2694m); north glacier and NW ridge.', trailhead_lat=46.0207, trailhead_lon=7.7491 WHERE id=30;
+UPDATE swiss_4000ers SET trailhead_name='Zermatt, Klein Matterhorn cable car (3883m)', trailhead_description='Cable car to Klein Matterhorn (3883m); Breithorn plateau to Zwillingsjoch, then WNW snow flank.', trailhead_lat=46.0207, trailhead_lon=7.7491 WHERE id=31;
+UPDATE swiss_4000ers SET trailhead_name='Zermatt, Klein Matterhorn cable car (3883m)', trailhead_description='Cable car to Klein Matterhorn (3883m); descend to Zwillingsjoch; SE snow and rock ridge with one fixed rope.', trailhead_lat=46.0207, trailhead_lon=7.7491 WHERE id=32;
+UPDATE swiss_4000ers SET trailhead_name='Zermatt, Klein Matterhorn cable car (3883m)', trailhead_description='Cable car to Klein Matterhorn (3883m); traverse Breithorn plateau and ascend 35 deg west summit snow flank.', trailhead_lat=46.0207, trailhead_lon=7.7491 WHERE id=33;
+UPDATE swiss_4000ers SET trailhead_name='Zermatt, Klein Matterhorn cable car (3883m)', trailhead_description='Cable car to Klein Matterhorn (3883m); traverse east from West Summit along Breithorn ridge.', trailhead_lat=46.0207, trailhead_lon=7.7491 WHERE id=34;
+UPDATE swiss_4000ers SET trailhead_name='Zermatt, Klein Matterhorn cable car (3883m)', trailhead_description='Cable car to Klein Matterhorn (3883m); full Breithorn traverse east past Mittelgipfel; technical east ridge.', trailhead_lat=46.0207, trailhead_lon=7.7491 WHERE id=35;
+UPDATE swiss_4000ers SET trailhead_name='Zermatt, Klein Matterhorn cable car (3883m)', trailhead_description='Cable car to Klein Matterhorn (3883m); Gendarm rock pinnacle during full Breithorn traverse after the Twins.', trailhead_lat=46.0207, trailhead_lon=7.7491 WHERE id=36;
+UPDATE swiss_4000ers SET trailhead_name='Zermatt, Klein Matterhorn cable car (3883m)', trailhead_description='Cable car to Klein Matterhorn (3883m); easternmost Breithorn summit, traversing the full east ridge.', trailhead_lat=46.0207, trailhead_lon=7.7491 WHERE id=37;
+UPDATE swiss_4000ers SET trailhead_name='Bourg-Saint-Pierre (1632m)', trailhead_description='Drive to Bourg-Saint-Pierre; trail up Valsorey valley to Cabane de Valsorey (3037m); Meitin Ridge and Corridor snow slope.', trailhead_lat=45.9417, trailhead_lon=7.2083 WHERE id=38;
+UPDATE swiss_4000ers SET trailhead_name='Bourg-Saint-Pierre (1632m)', trailhead_description='Drive to Bourg-Saint-Pierre; trail to Cabane de Valsorey (3037m); Meitin Ridge to Valsorey summit.', trailhead_lat=45.9417, trailhead_lon=7.2083 WHERE id=39;
+UPDATE swiss_4000ers SET trailhead_name='Bourg-Saint-Pierre (1632m)', trailhead_description='Drive to Bourg-Saint-Pierre; trail to Cabane de Valsorey (3037m); traverse from Grafeneire across Combin plateau.', trailhead_lat=45.9417, trailhead_lon=7.2083 WHERE id=40;
+UPDATE swiss_4000ers SET trailhead_name='Jungfraujoch railway station (3454m)', trailhead_description='Train to Jungfraujoch; glacier traverse via Konkordiaplatz and Gruenhornluecke to Finsteraarhornhuette (3048m); NE ridge.', trailhead_lat=46.5473, trailhead_lon=7.9853 WHERE id=41;
+UPDATE swiss_4000ers SET trailhead_name='Fiesch, cable car to Fiescheralp (2212m)', trailhead_description='Train to Fiesch; cable car to Fiescheralp (2212m); glacier approach via Hollandia Hut (3238m); SW ridge.', trailhead_lat=46.3983, trailhead_lon=8.1308 WHERE id=42;
+UPDATE swiss_4000ers SET trailhead_name='Jungfraujoch railway station (3454m)', trailhead_description='Train to Jungfraujoch; descend to Jungfraufirn, ascend via Rottalsattel — straightforward glacier route.', trailhead_lat=46.5473, trailhead_lon=7.9853 WHERE id=43;
+UPDATE swiss_4000ers SET trailhead_name='Jungfraujoch railway station (3454m)', trailhead_description='Train to Jungfraujoch; short glacier walk to Moenchsjochhuette; SE ridge — classic introductory alpine climb.', trailhead_lat=46.5473, trailhead_lon=7.9853 WHERE id=44;
+UPDATE swiss_4000ers SET trailhead_name='Grindelwald, Pfingstegg cable car (1391m)', trailhead_description='Cable car from Grindelwald to Pfingstegg (1391m); trail 4-5h to Schreckhornhuette (2527m); SW ridge.', trailhead_lat=46.6241, trailhead_lon=8.0414 WHERE id=45;
+UPDATE swiss_4000ers SET trailhead_name='Jungfraujoch railway station (3454m)', trailhead_description='Train to Jungfraujoch; Ewigschneefeld glacier approach; west ridge from Fieschersattel.', trailhead_lat=46.5473, trailhead_lon=7.9853 WHERE id=46;
+UPDATE swiss_4000ers SET trailhead_name='Jungfraujoch railway station (3454m)', trailhead_description='Train to Jungfraujoch; via Konkordiaplatz and Ewigschneefeld; Gruenhornluecke and NW ridge.', trailhead_lat=46.5473, trailhead_lon=7.9853 WHERE id=47;
+UPDATE swiss_4000ers SET trailhead_name='Grindelwald, Pfingstegg cable car (1391m)', trailhead_description='Cable car to Pfingstegg (1391m); trail to Schreckhornhuette (2527m); via Schreckhorn connection or Lauteraargletscher.', trailhead_lat=46.6241, trailhead_lon=8.0414 WHERE id=48;
+UPDATE swiss_4000ers SET trailhead_name='Jungfraujoch railway station (3454m)', trailhead_description='Train to Jungfraujoch; Ewigschneefeld approach; climbed together with Gross Fiescherhorn via Fieschersattel.', trailhead_lat=46.5473, trailhead_lon=7.9853 WHERE id=49;
+UPDATE swiss_4000ers SET trailhead_name='Diavolezza cable car / Bernina halt (2093m)', trailhead_description='Train to Diavolezza halt, cable car to Diavolezza (2978m); Spallagrat route via Pers Glacier, Rifugio Marco e Rosa (3609m) and Spallagrat ridge.', trailhead_lat=46.4106, trailhead_lon=9.9728 WHERE id=50;

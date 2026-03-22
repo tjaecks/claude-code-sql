@@ -112,6 +112,7 @@
       <span class="chip">Elevation: <strong id="chipElev">—</strong></span>
       <span class="chip">Summit GPS: <strong id="chipGPS">—</strong></span>
       <span class="chip">Distance from Richterswil: <strong id="chipDist">—</strong></span>
+      <span class="chip" id="chipTrailhead" style="display:none">Trailhead: <strong id="chipTrailheadName">—</strong></span>
     </div>
   </div>
 </header>
@@ -127,6 +128,13 @@
   const elev   = params.get('elev')  || '—';
   const dist   = params.get('dist')  || '—';
 
+  // Trailhead (optional)
+  const tName  = params.get('tname') || null;
+  const tDesc  = params.get('tdesc') || null;
+  const tLat   = params.get('tlat')  ? parseFloat(params.get('tlat'))  : null;
+  const tLon   = params.get('tlon')  ? parseFloat(params.get('tlon'))  : null;
+  const hasTrailhead = tLat !== null && tLon !== null;
+
   // Richterswil
   const HOME_LAT = 47.2050;
   const HOME_LON = 8.8381;
@@ -138,6 +146,10 @@
   document.getElementById('chipElev').textContent  = elev ? elev + ' m' : '—';
   document.getElementById('chipGPS').textContent   = lat.toFixed(4) + '°N, ' + lon.toFixed(4) + '°E';
   document.getElementById('chipDist').textContent  = dist ? dist + ' km' : '—';
+  if (hasTrailhead && tName) {
+    document.getElementById('chipTrailhead').style.display = '';
+    document.getElementById('chipTrailheadName').textContent = tName;
+  }
 
   // --- Map centre: midpoint between summit and home ---
   const midLat = (lat + HOME_LAT) / 2;
@@ -187,6 +199,20 @@
     popupAnchor: [0, -10]
   });
 
+  // --- Trailhead icon ---
+  const trailheadIcon = L.divIcon({
+    className: '',
+    html: `<div style="
+      width:14px;height:14px;
+      background:#27a85f;border:2.5px solid #fff;
+      border-radius:3px;
+      box-shadow:0 0 0 2px #27a85f;
+    "></div>`,
+    iconSize: [14, 14],
+    iconAnchor: [7, 7],
+    popupAnchor: [0, -10]
+  });
+
   // --- Markers ---
   L.marker([lat, lon], {icon: summitIcon})
     .addTo(map)
@@ -197,7 +223,16 @@
     .addTo(map)
     .bindPopup(`<strong>${HOME_NAME}</strong><br>47.2050°N, 8.8381°E`);
 
-  // --- Red line ---
+  if (hasTrailhead) {
+    const popupText = tDesc
+      ? `<strong>${tName || 'Trailhead'}</strong><br><span style="font-size:11px">${tDesc}</span>`
+      : `<strong>${tName || 'Trailhead'}</strong>`;
+    L.marker([tLat, tLon], {icon: trailheadIcon})
+      .addTo(map)
+      .bindPopup(popupText);
+  }
+
+  // --- Red dashed line: Richterswil → Summit ---
   L.polyline([[lat, lon], [HOME_LAT, HOME_LON]], {
     color: '#e03030',
     weight: 2.5,
@@ -205,15 +240,29 @@
     opacity: 0.85
   }).addTo(map);
 
+  // --- Green dotted line: Trailhead → Summit ---
+  if (hasTrailhead) {
+    L.polyline([[tLat, tLon], [lat, lon]], {
+      color: '#27a85f',
+      weight: 2,
+      dashArray: '4 4',
+      opacity: 0.8
+    }).addTo(map);
+  }
+
   // --- Legend ---
   const legend = L.control({position: 'bottomright'});
   legend.onAdd = () => {
     const div = L.DomUtil.create('div', 'legend');
-    div.innerHTML = `
-      <div><span class="legend-dot" style="background:#e03030"></span> ${name}</div>
+    let html = `
+      <div><span class="legend-dot" style="background:#e03030"></span> ${name} (summit)</div>
       <div><span class="legend-dot" style="background:#2266cc"></span> ${HOME_NAME}</div>
       <div><span class="legend-line"></span> Air distance: ${dist} km</div>
     `;
+    if (hasTrailhead) {
+      html += `<div><span class="legend-dot" style="background:#27a85f;border-radius:3px"></span> ${tName || 'Trailhead'}</div>`;
+    }
+    div.innerHTML = html;
     return div;
   };
   legend.addTo(map);
