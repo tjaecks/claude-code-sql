@@ -1,0 +1,252 @@
+{
+  "1": {
+    "name": "Dufourspitze",
+    "drive_distance_km": 209.5,
+    "drive_duration_h": 3.6
+  },
+  "2": {
+    "name": "Nordend",
+    "drive_distance_km": 209.5,
+    "drive_duration_h": 3.6
+  },
+  "3": {
+    "name": "Zumsteinspitze",
+    "drive_distance_km": 209.5,
+    "drive_duration_h": 3.6
+  },
+  "4": {
+    "name": "Signalkuppe",
+    "drive_distance_km": 346.1,
+    "drive_duration_h": 5.64
+  },
+  "5": {
+    "name": "Parrotspitze",
+    "drive_distance_km": 346.1,
+    "drive_duration_h": 5.64
+  },
+  "6": {
+    "name": "Ludwigshoehe",
+    "drive_distance_km": 346.1,
+    "drive_duration_h": 5.64
+  },
+  "7": {
+    "name": "Schwarzhorn",
+    "drive_distance_km": 346.1,
+    "drive_duration_h": 5.64
+  },
+  "8": {
+    "name": "Vincent Pyramid",
+    "drive_distance_km": 346.1,
+    "drive_duration_h": 5.64
+  },
+  "9": {
+    "name": "Dom",
+    "drive_distance_km": 200.3,
+    "drive_duration_h": 3.41
+  },
+  "10": {
+    "name": "Taeschhorn",
+    "drive_distance_km": 199.9,
+    "drive_duration_h": 3.41
+  },
+  "11": {
+    "name": "Nadelhorn",
+    "drive_distance_km": 199.9,
+    "drive_duration_h": 3.41
+  },
+  "12": {
+    "name": "Lenzspitze",
+    "drive_distance_km": 199.9,
+    "drive_duration_h": 3.41
+  },
+  "13": {
+    "name": "Stecknadelhorn",
+    "drive_distance_km": 199.9,
+    "drive_duration_h": 3.41
+  },
+  "14": {
+    "name": "Hohberghorn",
+    "drive_distance_km": 199.9,
+    "drive_duration_h": 3.41
+  },
+  "15": {
+    "name": "Duerrenhorn",
+    "drive_distance_km": 199.9,
+    "drive_duration_h": 3.41
+  },
+  "16": {
+    "name": "Alphubel",
+    "drive_distance_km": 199.9,
+    "drive_duration_h": 3.41
+  },
+  "17": {
+    "name": "Rimpfischhorn",
+    "drive_distance_km": 199.9,
+    "drive_duration_h": 3.41
+  },
+  "18": {
+    "name": "Strahlhorn",
+    "drive_distance_km": 199.9,
+    "drive_duration_h": 3.41
+  },
+  "19": {
+    "name": "Allalinhorn",
+    "drive_distance_km": 199.9,
+    "drive_duration_h": 3.41
+  },
+  "20": {
+    "name": "Weisshorn",
+    "drive_distance_km": 200.3,
+    "drive_duration_h": 3.41
+  },
+  "21": {
+    "name": "Bishorn",
+    "drive_distance_km": 228.1,
+    "drive_duration_h": 3.76
+  },
+  "22": {
+    "name": "Dent Blanche",
+    "drive_distance_km": 256.7,
+    "drive_duration_h": 5.42
+  },
+  "23": {
+    "name": "Zinalrothorn",
+    "drive_distance_km": 209.5,
+    "drive_duration_h": 3.6
+  },
+  "24": {
+    "name": "Ober Gabelhorn",
+    "drive_distance_km": 209.5,
+    "drive_duration_h": 3.6
+  },
+  "25": {
+    "name": "Weissmies",
+    "drive_distance_km": 195.8,
+    "drive_duration_h": 3.32
+  },
+  "26": {
+    "name": "Lagginhorn",
+    "drive_distance_km": 195.8,
+    "drive_duration_h": 3.32
+  },
+  "27": {
+    "name": "Lyskamm Ostgipfel",
+    "drive_distance_km": 209.5,
+    "drive_duration_h": 3.6
+  },
+  "28": {
+    "name": "Lyskamm Westgipfel",
+    "drive_distance_km": 209.5,
+    "drive_duration_h": 3.6
+  },
+  "29": {
+    "name": "Matterhorn",
+    "drive_distance_km": 209.5,
+    "drive_duration_h": 3.6
+  },
+  "30": {
+    "name": "Dent d'Herens",
+    "drive_distance_km": 209.5,
+    "drive_duration_h": 3.6
+  },
+  "31": {
+    "name": "Castor",
+    "drive_distance_km": 209.5,
+    "drive_duration_h": 3.6
+  },
+  "32": {
+    "name": "Pollux",
+    "drive_distance_km": 209.5,
+    "drive_duration_h": 3.6
+  },
+  "33": {
+    "name": "Breithorn West",
+    "drive_distance_km": 209.5,
+    "drive_duration_h": 3.6
+  },
+  "34": {
+    "name": "Breithorn Mittelgipfel",
+    "drive_distance_km": 209.5,
+    "drive_duration_h": 3.6
+  },
+  "35": {
+    "name": "Breithorn Zwillinge W",
+    "drive_distance_km": 209.5,
+    "drive_duration_h": 3.6
+  },
+  "36": {
+    "name": "Breithorn Gendarm",
+    "drive_distance_km": 209.5,
+    "drive_duration_h": 3.6
+  },
+  "37": {
+    "name": "Breithorn Roccia Nera",
+    "drive_distance_km": 209.5,
+    "drive_duration_h": 3.6
+  },
+  "38": {
+    "name": "Combin de Grafeneire",
+    "drive_distance_km": 323.6,
+    "drive_duration_h": 3.89
+  },
+  "39": {
+    "name": "Combin de Valsorey",
+    "drive_distance_km": 323.6,
+    "drive_duration_h": 3.89
+  },
+  "40": {
+    "name": "Combin de la Tsessette",
+    "drive_distance_km": 323.6,
+    "drive_duration_h": 3.89
+  },
+  "41": {
+    "name": "Finsteraarhorn",
+    "drive_distance_km": 158.7,
+    "drive_duration_h": 3.53
+  },
+  "42": {
+    "name": "Aletschhorn",
+    "drive_distance_km": 150.2,
+    "drive_duration_h": 2.51
+  },
+  "43": {
+    "name": "Jungfrau",
+    "drive_distance_km": 158.7,
+    "drive_duration_h": 3.53
+  },
+  "44": {
+    "name": "Moench",
+    "drive_distance_km": 158.7,
+    "drive_duration_h": 3.53
+  },
+  "45": {
+    "name": "Schreckhorn",
+    "drive_distance_km": 147.0,
+    "drive_duration_h": 2.2
+  },
+  "46": {
+    "name": "Gross Fiescherhorn",
+    "drive_distance_km": 158.7,
+    "drive_duration_h": 3.53
+  },
+  "47": {
+    "name": "Gruenhorn",
+    "drive_distance_km": 158.7,
+    "drive_duration_h": 3.53
+  },
+  "48": {
+    "name": "Lauteraarhorn",
+    "drive_distance_km": 147.0,
+    "drive_duration_h": 2.2
+  },
+  "49": {
+    "name": "Hinteres Fiescherhorn",
+    "drive_distance_km": 158.7,
+    "drive_duration_h": 3.53
+  },
+  "50": {
+    "name": "Piz Bernina",
+    "drive_distance_km": 184.4,
+    "drive_duration_h": 3.49
+  }
+}

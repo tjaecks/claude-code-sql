@@ -66,6 +66,7 @@
       color: #cde;
     }
     .chip strong { color: #fff; }
+    .chip.drive { background: #1a3a5c; border: 1px solid #2266cc; }
 
     #map {
       flex: 1;
@@ -100,6 +101,10 @@
       vertical-align: middle;
       border-radius: 2px;
     }
+    .legend-line.blue {
+      background: #2266cc;
+      height: 4px;
+    }
   </style>
 </head>
 <body>
@@ -113,6 +118,7 @@
       <span class="chip">Summit GPS: <strong id="chipGPS">—</strong></span>
       <span class="chip">Distance from Richterswil: <strong id="chipDist">—</strong></span>
       <span class="chip" id="chipTrailhead" style="display:none">Trailhead: <strong id="chipTrailheadName">—</strong></span>
+      <span class="chip drive" id="chipDrive" style="display:none">🚗 Drive to trailhead: <strong id="chipDriveVal">—</strong></span>
     </div>
   </div>
 </header>
@@ -121,23 +127,28 @@
 
 <script>
   // --- Parse URL params ---
-  const params = new URLSearchParams(location.search);
-  const name   = params.get('name')  || 'Summit';
-  const lat    = parseFloat(params.get('lat'))  || 46.0;
-  const lon    = parseFloat(params.get('lon'))  || 8.0;
-  const elev   = params.get('elev')  || '—';
-  const dist   = params.get('dist')  || '—';
+  const params  = new URLSearchParams(location.search);
+  const name    = params.get('name')  || 'Summit';
+  const lat     = parseFloat(params.get('lat'))  || 46.0;
+  const lon     = parseFloat(params.get('lon'))  || 8.0;
+  const elev    = params.get('elev')  || '—';
+  const dist    = params.get('dist')  || '—';
 
   // Trailhead (optional)
-  const tName  = params.get('tname') || null;
-  const tDesc  = params.get('tdesc') || null;
-  const tLat   = params.get('tlat')  ? parseFloat(params.get('tlat'))  : null;
-  const tLon   = params.get('tlon')  ? parseFloat(params.get('tlon'))  : null;
+  const tName   = params.get('tname') || null;
+  const tDesc   = params.get('tdesc') || null;
+  const tLat    = params.get('tlat')  ? parseFloat(params.get('tlat'))  : null;
+  const tLon    = params.get('tlon')  ? parseFloat(params.get('tlon'))  : null;
   const hasTrailhead = tLat !== null && tLon !== null;
 
+  // Driving route (optional)
+  const driveKm = params.get('drivekm') ? parseFloat(params.get('drivekm')) : null;
+  const driveH  = params.get('driveh')  ? parseFloat(params.get('driveh'))  : null;
+  const hasDrive = hasTrailhead && driveKm !== null;
+
   // Richterswil
-  const HOME_LAT = 47.2050;
-  const HOME_LON = 8.8381;
+  const HOME_LAT  = 47.2050;
+  const HOME_LON  = 8.8381;
   const HOME_NAME = 'Richterswil (8805)';
 
   // --- Fill header info ---
@@ -149,6 +160,13 @@
   if (hasTrailhead && tName) {
     document.getElementById('chipTrailhead').style.display = '';
     document.getElementById('chipTrailheadName').textContent = tName;
+  }
+  if (hasDrive) {
+    document.getElementById('chipDrive').style.display = '';
+    const hrs = Math.floor(driveH);
+    const mins = Math.round((driveH - hrs) * 60);
+    const durStr = hrs + 'h ' + (mins > 0 ? mins + 'min' : '');
+    document.getElementById('chipDriveVal').textContent = driveKm + ' km · ' + durStr;
   }
 
   // --- Map centre: midpoint between summit and home ---
@@ -199,7 +217,6 @@
     popupAnchor: [0, -10]
   });
 
-  // --- Trailhead icon ---
   const trailheadIcon = L.divIcon({
     className: '',
     html: `<div style="
@@ -232,7 +249,7 @@
       .bindPopup(popupText);
   }
 
-  // --- Red dashed line: Richterswil → Summit ---
+  // --- Red dashed line: Richterswil → Summit (air distance) ---
   L.polyline([[lat, lon], [HOME_LAT, HOME_LON]], {
     color: '#e03030',
     weight: 2.5,
@@ -262,10 +279,36 @@
     if (hasTrailhead) {
       html += `<div><span class="legend-dot" style="background:#27a85f;border-radius:3px"></span> ${tName || 'Trailhead'}</div>`;
     }
+    if (hasDrive) {
+      html += `<div><span class="legend-line blue"></span> Drive: ${driveKm} km</div>`;
+    }
     div.innerHTML = html;
     return div;
   };
   legend.addTo(map);
+
+  // --- Fetch driving route from OSRM and draw thick blue line ---
+  if (hasDrive) {
+    const osrmUrl =
+      `https://router.project-osrm.org/route/v1/driving/` +
+      `${HOME_LON},${HOME_LAT};${tLon},${tLat}` +
+      `?overview=full&geometries=geojson`;
+
+    fetch(osrmUrl)
+      .then(r => r.json())
+      .then(data => {
+        if (data.code !== 'Ok' || !data.routes.length) return;
+        const coords = data.routes[0].geometry.coordinates;
+        // OSRM returns [lon, lat] — Leaflet needs [lat, lon]
+        const latLngs = coords.map(c => [c[1], c[0]]);
+        L.polyline(latLngs, {
+          color: '#2266cc',
+          weight: 5,
+          opacity: 0.85
+        }).addTo(map);
+      })
+      .catch(() => {/* silently ignore if OSRM unavailable */});
+  }
 </script>
 
 </body>

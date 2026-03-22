@@ -25,6 +25,9 @@ CREATE TABLE swiss_4000ers (
     trailhead_description   TEXT,                       -- Short route approach & travel info (source: SAC Tourenportal)
     trailhead_lat           DECIMAL(9,6),               -- WGS84 latitude of trailhead
     trailhead_lon           DECIMAL(9,6),               -- WGS84 longitude of trailhead
+    drive_distance_km       DECIMAL(6,1),               -- Road distance from Richterswil to trailhead (km, OSRM)
+    drive_duration_h        DECIMAL(5,2),               -- Typical driving time in hours (OSRM, no traffic)
+    drive_route_geojson     LONGTEXT,                   -- GeoJSON LineString of the driving route (OSRM)
     notes                   TEXT,
     created_at              TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
@@ -431,3 +434,58 @@ UPDATE swiss_4000ers SET trailhead_name='Jungfraujoch railway station (3454m)', 
 UPDATE swiss_4000ers SET trailhead_name='Grindelwald, Pfingstegg cable car (1391m)', trailhead_description='Cable car to Pfingstegg (1391m); trail to Schreckhornhuette (2527m); via Schreckhorn connection or Lauteraargletscher.', trailhead_lat=46.6241, trailhead_lon=8.0414 WHERE id=48;
 UPDATE swiss_4000ers SET trailhead_name='Jungfraujoch railway station (3454m)', trailhead_description='Train to Jungfraujoch; Ewigschneefeld approach; climbed together with Gross Fiescherhorn via Fieschersattel.', trailhead_lat=46.5473, trailhead_lon=7.9853 WHERE id=49;
 UPDATE swiss_4000ers SET trailhead_name='Diavolezza cable car / Bernina halt (2093m)', trailhead_description='Train to Diavolezza halt, cable car to Diavolezza (2978m); Spallagrat route via Pers Glacier, Rifugio Marco e Rosa (3609m) and Spallagrat ridge.', trailhead_lat=46.4106, trailhead_lon=9.9728 WHERE id=50;
+
+-- ============================================================
+-- Driving route data: Richterswil → trailhead (source: OSRM demo server)
+-- ============================================================
+
+UPDATE swiss_4000ers SET drive_distance_km=209.5, drive_duration_h=3.6 WHERE id=1;
+UPDATE swiss_4000ers SET drive_distance_km=209.5, drive_duration_h=3.6 WHERE id=2;
+UPDATE swiss_4000ers SET drive_distance_km=209.5, drive_duration_h=3.6 WHERE id=3;
+UPDATE swiss_4000ers SET drive_distance_km=346.1, drive_duration_h=5.64 WHERE id=4;
+UPDATE swiss_4000ers SET drive_distance_km=346.1, drive_duration_h=5.64 WHERE id=5;
+UPDATE swiss_4000ers SET drive_distance_km=346.1, drive_duration_h=5.64 WHERE id=6;
+UPDATE swiss_4000ers SET drive_distance_km=346.1, drive_duration_h=5.64 WHERE id=7;
+UPDATE swiss_4000ers SET drive_distance_km=346.1, drive_duration_h=5.64 WHERE id=8;
+UPDATE swiss_4000ers SET drive_distance_km=200.3, drive_duration_h=3.41 WHERE id=9;
+UPDATE swiss_4000ers SET drive_distance_km=199.9, drive_duration_h=3.41 WHERE id=10;
+UPDATE swiss_4000ers SET drive_distance_km=199.9, drive_duration_h=3.41 WHERE id=11;
+UPDATE swiss_4000ers SET drive_distance_km=199.9, drive_duration_h=3.41 WHERE id=12;
+UPDATE swiss_4000ers SET drive_distance_km=199.9, drive_duration_h=3.41 WHERE id=13;
+UPDATE swiss_4000ers SET drive_distance_km=199.9, drive_duration_h=3.41 WHERE id=14;
+UPDATE swiss_4000ers SET drive_distance_km=199.9, drive_duration_h=3.41 WHERE id=15;
+UPDATE swiss_4000ers SET drive_distance_km=199.9, drive_duration_h=3.41 WHERE id=16;
+UPDATE swiss_4000ers SET drive_distance_km=199.9, drive_duration_h=3.41 WHERE id=17;
+UPDATE swiss_4000ers SET drive_distance_km=199.9, drive_duration_h=3.41 WHERE id=18;
+UPDATE swiss_4000ers SET drive_distance_km=199.9, drive_duration_h=3.41 WHERE id=19;
+UPDATE swiss_4000ers SET drive_distance_km=200.3, drive_duration_h=3.41 WHERE id=20;
+UPDATE swiss_4000ers SET drive_distance_km=228.1, drive_duration_h=3.76 WHERE id=21;
+UPDATE swiss_4000ers SET drive_distance_km=256.7, drive_duration_h=5.42 WHERE id=22;
+UPDATE swiss_4000ers SET drive_distance_km=209.5, drive_duration_h=3.6 WHERE id=23;
+UPDATE swiss_4000ers SET drive_distance_km=209.5, drive_duration_h=3.6 WHERE id=24;
+UPDATE swiss_4000ers SET drive_distance_km=195.8, drive_duration_h=3.32 WHERE id=25;
+UPDATE swiss_4000ers SET drive_distance_km=195.8, drive_duration_h=3.32 WHERE id=26;
+UPDATE swiss_4000ers SET drive_distance_km=209.5, drive_duration_h=3.6 WHERE id=27;
+UPDATE swiss_4000ers SET drive_distance_km=209.5, drive_duration_h=3.6 WHERE id=28;
+UPDATE swiss_4000ers SET drive_distance_km=209.5, drive_duration_h=3.6 WHERE id=29;
+UPDATE swiss_4000ers SET drive_distance_km=209.5, drive_duration_h=3.6 WHERE id=30;
+UPDATE swiss_4000ers SET drive_distance_km=209.5, drive_duration_h=3.6 WHERE id=31;
+UPDATE swiss_4000ers SET drive_distance_km=209.5, drive_duration_h=3.6 WHERE id=32;
+UPDATE swiss_4000ers SET drive_distance_km=209.5, drive_duration_h=3.6 WHERE id=33;
+UPDATE swiss_4000ers SET drive_distance_km=209.5, drive_duration_h=3.6 WHERE id=34;
+UPDATE swiss_4000ers SET drive_distance_km=209.5, drive_duration_h=3.6 WHERE id=35;
+UPDATE swiss_4000ers SET drive_distance_km=209.5, drive_duration_h=3.6 WHERE id=36;
+UPDATE swiss_4000ers SET drive_distance_km=209.5, drive_duration_h=3.6 WHERE id=37;
+UPDATE swiss_4000ers SET drive_distance_km=323.6, drive_duration_h=3.89 WHERE id=38;
+UPDATE swiss_4000ers SET drive_distance_km=323.6, drive_duration_h=3.89 WHERE id=39;
+UPDATE swiss_4000ers SET drive_distance_km=323.6, drive_duration_h=3.89 WHERE id=40;
+UPDATE swiss_4000ers SET drive_distance_km=158.7, drive_duration_h=3.53 WHERE id=41;
+UPDATE swiss_4000ers SET drive_distance_km=150.2, drive_duration_h=2.51 WHERE id=42;
+UPDATE swiss_4000ers SET drive_distance_km=158.7, drive_duration_h=3.53 WHERE id=43;
+UPDATE swiss_4000ers SET drive_distance_km=158.7, drive_duration_h=3.53 WHERE id=44;
+UPDATE swiss_4000ers SET drive_distance_km=147.0, drive_duration_h=2.2 WHERE id=45;
+UPDATE swiss_4000ers SET drive_distance_km=158.7, drive_duration_h=3.53 WHERE id=46;
+UPDATE swiss_4000ers SET drive_distance_km=158.7, drive_duration_h=3.53 WHERE id=47;
+UPDATE swiss_4000ers SET drive_distance_km=147.0, drive_duration_h=2.2 WHERE id=48;
+UPDATE swiss_4000ers SET drive_distance_km=158.7, drive_duration_h=3.53 WHERE id=49;
+UPDATE swiss_4000ers SET drive_distance_km=184.4, drive_duration_h=3.49 WHERE id=50;
