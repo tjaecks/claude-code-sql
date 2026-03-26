@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Swiss Prepaid Tariff Comparison</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: system-ui, sans-serif; background: #f4f6f9; color: #222; padding: 24px; }
+  h1 { font-size: 1.4rem; margin-bottom: 4px; }
+  p.sub { color: #666; font-size: 0.85rem; margin-bottom: 20px; }
+
+  .controls { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 16px; align-items: center; }
+  input[type=search] {
+    padding: 8px 12px; border: 1px solid #ccc; border-radius: 6px;
+    font-size: 0.9rem; width: 240px;
+  }
+  select {
+    padding: 8px 12px; border: 1px solid #ccc; border-radius: 6px;
+    font-size: 0.9rem; background: #fff;
+  }
+  .count { margin-left: auto; font-size: 0.85rem; color: #666; }
+
+  table { width: 100%; border-collapse: collapse; background: #fff; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 4px rgba(0,0,0,.1); }
+  thead tr { background: #1a1a2e; color: #fff; }
+  th { padding: 11px 14px; text-align: left; font-size: 0.82rem; font-weight: 600; letter-spacing: .03em; cursor: pointer; user-select: none; white-space: nowrap; }
+  th:hover { background: #2e2e50; }
+  th.sorted-asc::after  { content: " ▲"; opacity: .8; }
+  th.sorted-desc::after { content: " ▼"; opacity: .8; }
+  td { padding: 9px 14px; font-size: 0.85rem; border-bottom: 1px solid #f0f0f0; }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: #f8f9ff; }
+
+  .op-swisscom { background: #e6f0ff; color: #1a5fd4; }
+  .op-sunrise  { background: #fff3e0; color: #c45c00; }
+  .op-salt     { background: #e8f5e9; color: #2e7d32; }
+  .badge { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 0.78rem; font-weight: 600; }
+
+  .unlimited { color: #2e7d32; font-weight: 600; }
+  .payperuse { color: #888; font-style: italic; }
+  .no-rows { text-align: center; padding: 32px; color: #999; }
+</style>
+</head>
+<body>
+
+<h1>Swiss Mobile Prepaid Tariffs</h1>
+<p class="sub">Swisscom · Sunrise · Salt — data collected 2026-03-26</p>
+
+<div class="controls">
+  <input type="search" id="search" placeholder="Search tariff, tier, notes…">
+  <select id="filterOp">
+    <option value="">All operators</option>
+    <option>Swisscom</option>
+    <option>Sunrise</option>
+    <option>Salt</option>
+  </select>
+  <select id="filterPeriod">
+    <option value="">All periods</option>
+    <option value="daily">Daily</option>
+    <option value="30-days">30 days</option>
+    <option value="90-days">90 days</option>
+    <option value="7-days">7 days</option>
+    <option value="15-days">15 days</option>
+    <option value="pay-per-use">Pay-per-use</option>
+  </select>
+  <span class="count" id="rowCount"></span>
+</div>
+
+<table id="tbl">
+  <thead>
+    <tr>
+      <th data-col="operator">Operator</th>
+      <th data-col="tariff_name">Tariff</th>
+      <th data-col="tier_name">Tier</th>
+      <th data-col="price_chf">Price (CHF)</th>
+      <th data-col="price_period">Period</th>
+      <th data-col="data_gb">Data (GB)</th>
+      <th data-col="validity_days">Validity (days)</th>
+      <th data-col="minutes_included">Minutes</th>
+      <th data-col="sms_unlimited">SMS</th>
+      <th data-col="notes">Notes</th>
+    </tr>
+  </thead>
+  <tbody id="tbody"></tbody>
+</table>
+
+<script>
+const DATA = [
+  // Swisscom
+  { operator:"Swisscom", tariff_name:"Prepaid Basic",        tier_name:"Basic",      price_chf:0.00,  price_period:"pay-per-use", data_gb:null,  data_unlimited:false, validity_days:null, minutes_included:null, sms_unlimited:false, notes:"CHF 0.29/min; CHF 0.15/SMS; CHF 2/day data" },
+  { operator:"Swisscom", tariff_name:"Prepaid Plus",         tier_name:"Plus",       price_chf:5.00,  price_period:"30-days",     data_gb:null,  data_unlimited:true,  validity_days:30,   minutes_included:null, sms_unlimited:true,  notes:"Unlimited SMS; throttled data 128 kbit/s; auto-renews" },
+  { operator:"Swisscom", tariff_name:"Prepaid Flat",         tier_name:"7 days",     price_chf:20.00, price_period:"7-days",      data_gb:null,  data_unlimited:true,  validity_days:7,    minutes_included:-1,   sms_unlimited:true,  notes:"Unlimited calls/SMS/data 50 Mbit/s; tourist SIM" },
+  { operator:"Swisscom", tariff_name:"Prepaid Flat",         tier_name:"15 days",    price_chf:40.00, price_period:"15-days",     data_gb:null,  data_unlimited:true,  validity_days:15,   minutes_included:-1,   sms_unlimited:true,  notes:"Unlimited calls/SMS/data 50 Mbit/s; tourist SIM" },
+  { operator:"Swisscom", tariff_name:"Prepaid Flat",         tier_name:"30 days",    price_chf:65.00, price_period:"30-days",     data_gb:null,  data_unlimited:true,  validity_days:30,   minutes_included:-1,   sms_unlimited:true,  notes:"Unlimited calls/SMS/data 50 Mbit/s; tourist SIM" },
+  { operator:"Swisscom", tariff_name:"Prepaid Flat",         tier_name:"90 days",    price_chf:150.00,price_period:"90-days",     data_gb:null,  data_unlimited:true,  validity_days:90,   minutes_included:-1,   sms_unlimited:true,  notes:"Unlimited calls/SMS/data 50 Mbit/s; tourist SIM" },
+  // Sunrise
+  { operator:"Sunrise",  tariff_name:"Prepaid Airbag",       tier_name:"Base",       price_chf:0.00,  price_period:"pay-per-use", data_gb:0.3,   data_unlimited:false, validity_days:null, minutes_included:null, sms_unlimited:false, notes:"CHF 0.30/min; CHF 0.20/SMS; 300 MB/day cap" },
+  { operator:"Sunrise",  tariff_name:"Prepaid Unlimited",    tier_name:"Daily Pass", price_chf:2.50,  price_period:"daily",       data_gb:null,  data_unlimited:true,  validity_days:1,    minutes_included:-1,   sms_unlimited:true,  notes:"Unlimited calls/SMS/data 150 Mbit/s for 24h" },
+  { operator:"Sunrise",  tariff_name:"Prepaid Unlimited",    tier_name:"30 days",    price_chf:50.00, price_period:"30-days",     data_gb:null,  data_unlimited:true,  validity_days:30,   minutes_included:-1,   sms_unlimited:true,  notes:"Unlimited calls/SMS/data" },
+  { operator:"Sunrise",  tariff_name:"Prepaid Unlimited",    tier_name:"90 days",    price_chf:40.00, price_period:"30-days",     data_gb:null,  data_unlimited:true,  validity_days:90,   minutes_included:-1,   sms_unlimited:true,  notes:"CHF 40/month on 90-day commitment" },
+  { operator:"Sunrise",  tariff_name:"Airbag + Budget",      tier_name:"Budget 10",  price_chf:10.00, price_period:"30-days",     data_gb:0.3,   data_unlimited:false, validity_days:30,   minutes_included:30,   sms_unlimited:false, notes:"300 MB + 30 min + 30 SMS" },
+  { operator:"Sunrise",  tariff_name:"Airbag + Budget",      tier_name:"Budget 15",  price_chf:15.00, price_period:"30-days",     data_gb:0.6,   data_unlimited:false, validity_days:30,   minutes_included:60,   sms_unlimited:false, notes:"600 MB + 60 min + 60 SMS" },
+  { operator:"Sunrise",  tariff_name:"Airbag + Data Option", tier_name:"Data S",     price_chf:7.50,  price_period:"30-days",     data_gb:0.5,   data_unlimited:false, validity_days:30,   minutes_included:null, sms_unlimited:false, notes:"500 MB add-on; calls at Airbag rates" },
+  { operator:"Sunrise",  tariff_name:"Airbag + Data Option", tier_name:"Data M",     price_chf:10.00, price_period:"30-days",     data_gb:1.0,   data_unlimited:false, validity_days:30,   minutes_included:null, sms_unlimited:false, notes:"1 GB add-on; calls at Airbag rates" },
+  { operator:"Sunrise",  tariff_name:"Airbag + Data Option", tier_name:"Data L",     price_chf:20.00, price_period:"30-days",     data_gb:3.0,   data_unlimited:false, validity_days:30,   minutes_included:null, sms_unlimited:false, notes:"3 GB add-on; calls at Airbag rates" },
+  { operator:"Sunrise",  tariff_name:"Airbag + Data Option", tier_name:"Data XL",    price_chf:45.00, price_period:"30-days",     data_gb:10.0,  data_unlimited:false, validity_days:30,   minutes_included:null, sms_unlimited:false, notes:"10 GB add-on; calls at Airbag rates" },
+  // Salt
+  { operator:"Salt",     tariff_name:"PrePay",               tier_name:"Base",       price_chf:0.00,  price_period:"pay-per-use", data_gb:null,  data_unlimited:false, validity_days:null, minutes_included:null, sms_unlimited:false, notes:"CHF 0.49/call (max 60 min); CHF 0.12/SMS; free SIM + CHF 10 credit" },
+  { operator:"Salt",     tariff_name:"PrePay Data Pack",     tier_name:"100 MB",     price_chf:3.00,  price_period:"30-days",     data_gb:0.1,   data_unlimited:false, validity_days:30,   minutes_included:null, sms_unlimited:false, notes:"100 MB; calls/SMS at base rates" },
+  { operator:"Salt",     tariff_name:"PrePay Data Pack",     tier_name:"500 MB",     price_chf:9.00,  price_period:"30-days",     data_gb:0.5,   data_unlimited:false, validity_days:30,   minutes_included:null, sms_unlimited:false, notes:"500 MB; calls/SMS at base rates" },
+  { operator:"Salt",     tariff_name:"PrePay Data Pack",     tier_name:"1 GB",       price_chf:15.00, price_period:"30-days",     data_gb:1.0,   data_unlimited:false, validity_days:30,   minutes_included:null, sms_unlimited:false, notes:"1 GB; calls/SMS at base rates" },
+  { operator:"Salt",     tariff_name:"PrePay Unlimited Surf",tier_name:"Daily",      price_chf:1.99,  price_period:"daily",       data_gb:null,  data_unlimited:true,  validity_days:1,    minutes_included:null, sms_unlimited:false, notes:"Unlimited daily data; calls/SMS still at base rates" },
+];
+
+let sortCol = "price_chf", sortDir = 1;
+
+function fmtData(row) {
+  if (row.data_unlimited) return '<span class="unlimited">Unlimited</span>';
+  if (row.data_gb === null) return '<span class="payperuse">pay-per-use</span>';
+  return row.data_gb < 1 ? (row.data_gb * 1000).toFixed(0) + " MB" : row.data_gb.toFixed(1) + " GB";
+}
+function fmtMin(v) {
+  if (v === -1) return '<span class="unlimited">Unlimited</span>';
+  if (v === null) return '<span class="payperuse">pay-per-use</span>';
+  return v;
+}
+function fmtSms(row) {
+  if (row.sms_unlimited) return '<span class="unlimited">Unlimited</span>';
+  return '<span class="payperuse">pay-per-use</span>';
+}
+function opBadge(op) {
+  const cls = "op-" + op.toLowerCase();
+  return `<span class="badge ${cls}">${op}</span>`;
+}
+
+function sortValue(row, col) {
+  const v = row[col];
+  return v === null ? (sortDir === 1 ? Infinity : -Infinity) : v;
+}
+
+function render() {
+  const q      = document.getElementById("search").value.toLowerCase();
+  const opF    = document.getElementById("filterOp").value;
+  const perF   = document.getElementById("filterPeriod").value;
+
+  let rows = DATA.filter(r => {
+    if (opF  && r.operator     !== opF)  return false;
+    if (perF && r.price_period !== perF) return false;
+    if (q) {
+      const hay = [r.operator, r.tariff_name, r.tier_name, r.price_period, r.notes].join(" ").toLowerCase();
+      if (!hay.includes(q)) return false;
+    }
+    return true;
+  });
+
+  rows.sort((a, b) => {
+    const av = sortValue(a, sortCol), bv = sortValue(b, sortCol);
+    if (av < bv) return -sortDir;
+    if (av > bv) return  sortDir;
+    return 0;
+  });
+
+  document.getElementById("rowCount").textContent = `${rows.length} of ${DATA.length} rows`;
+
+  const tbody = document.getElementById("tbody");
+  if (!rows.length) {
+    tbody.innerHTML = `<tr><td colspan="10" class="no-rows">No matching tariffs.</td></tr>`;
+    return;
+  }
+  tbody.innerHTML = rows.map(r => `
+    <tr>
+      <td>${opBadge(r.operator)}</td>
+      <td>${r.tariff_name}</td>
+      <td>${r.tier_name}</td>
+      <td>${r.price_chf.toFixed(2)}</td>
+      <td>${r.price_period}</td>
+      <td>${fmtData(r)}</td>
+      <td>${r.validity_days ?? "—"}</td>
+      <td>${fmtMin(r.minutes_included)}</td>
+      <td>${fmtSms(r)}</td>
+      <td style="color:#555">${r.notes}</td>
+    </tr>`).join("");
+}
+
+// Sorting
+document.querySelectorAll("th[data-col]").forEach(th => {
+  th.addEventListener("click", () => {
+    const col = th.dataset.col;
+    if (sortCol === col) sortDir *= -1; else { sortCol = col; sortDir = 1; }
+    document.querySelectorAll("th").forEach(t => t.classList.remove("sorted-asc","sorted-desc"));
+    th.classList.add(sortDir === 1 ? "sorted-asc" : "sorted-desc");
+    render();
+  });
+});
+
+// Filtering
+["search","filterOp","filterPeriod"].forEach(id =>
+  document.getElementById(id).addEventListener("input", render)
+);
+
+render();
+
+// Default sort indicator
+document.querySelector(`th[data-col="${sortCol}"]`).classList.add("sorted-asc");
+</script>
+</body>
+</html>
